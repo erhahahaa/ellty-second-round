@@ -1,0 +1,100 @@
+services:
+  # ===================================
+  # Infrastructure Services
+  # ===================================
+  postgres:
+    image: postgres:17
+    command: "-d 1"
+    container_name: ellty-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-main}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-main}"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - ellty-network
+
+  redis:
+    image: redis:8.0-alpine
+    container_name: ellty-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ellty-network
+
+  # ===================================
+  # Application Services
+  # ===================================
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+      target: dev
+    container_name: ellty-server
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-main}
+      REDIS_URL: redis://redis:6379
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-sw6NRM0R5ERuN0oiMfNcvAaj5LYrqd14}
+      BETTER_AUTH_URL: http://localhost:3000
+      CORS_ORIGIN: http://localhost:3001
+    volumes:
+      - ./packages:/app/packages:ro
+      - ./apps/server/src:/app/apps/server/src:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - ellty-network
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: dev
+    container_name: ellty-web
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      DOCKER: "true"
+      VITE_SERVER_URL: http://localhost:3000
+    volumes:
+      - ./packages:/app/packages:ro
+      - ./apps/web/src:/app/apps/web/src:ro
+    depends_on:
+      - server
+    networks:
+      - ellty-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  ellty-network:
+    driver: bridge
