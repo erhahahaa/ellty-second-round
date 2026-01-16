@@ -1,0 +1,24 @@
+{
+	"name": "@ellty-second-round/auth",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {},
+	"dependencies": {
+		"@ellty-second-round/db": "workspace:*",
+		"@ellty-second-round/env": "workspace:*",
+		"better-auth": "catalog:",
+		"dotenv": "catalog:",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@ellty-second-round/config": "workspace:*",
+		"typescript": "catalog:"
+	}
+}
