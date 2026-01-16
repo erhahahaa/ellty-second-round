@@ -1,0 +1,33 @@
+{
+	"name": "@ellty-second-round/db",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {
+		"db:push": "drizzle-kit push",
+		"db:generate": "drizzle-kit generate",
+		"db:studio": "drizzle-kit studio",
+		"db:migrate": "drizzle-kit migrate"
+	},
+	"dependencies": {
+		"@ellty-second-round/env": "workspace:*",
+		"@neondatabase/serverless": "^1.0.2",
+		"dotenv": "catalog:",
+		"drizzle-orm": "^0.45.1",
+		"ws": "^8.19.0",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@ellty-second-round/config": "workspace:*",
+		"@types/pg": "^8.15.6",
+		"@types/ws": "^8.18.1",
+		"drizzle-kit": "^0.31.8",
+		"typescript": "catalog:"
+	}
+}
