@@ -1,6 +1,7 @@
 import { createContext } from "@ellty-second-round/api/context";
 import { appRouter } from "@ellty-second-round/api/routers/index";
-import { auth } from "@ellty-second-round/auth";
+import { createAuth } from "@ellty-second-round/auth";
+import { getDb } from "@ellty-second-round/db";
 import { env } from "@ellty-second-round/env/server";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
@@ -11,7 +12,14 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 
-const app = new Hono();
+interface HonoContext {
+	Bindings: Record<string, unknown>;
+	Variables: {
+		db: ReturnType<typeof getDb>;
+	};
+}
+
+const app = new Hono<HonoContext>();
 
 app.use(logger());
 app.use(
@@ -24,7 +32,16 @@ app.use(
 	}),
 );
 
-app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
+// Auth routes - handle their own DB connection lifecycle
+app.on(["POST", "GET"], "/api/auth/*", async (c) => {
+	const { db, close } = getDb();
+	try {
+		const auth = createAuth(db);
+		return auth.handler(c.req.raw);
+	} finally {
+		// await close();
+	}
+});
 
 export const apiHandler = new OpenAPIHandler(appRouter, {
 	plugins: [
@@ -47,32 +64,57 @@ export const rpcHandler = new RPCHandler(appRouter, {
 	],
 });
 
-app.use("/*", async (c, next) => {
-	const context = await createContext({ context: c });
+// RPC routes
+app.use("/rpc/*", async (c) => {
+	const dbConnection = getDb();
+	const context = await createContext({ context: c, db: dbConnection });
 
-	const rpcResult = await rpcHandler.handle(c.req.raw, {
-		prefix: "/rpc",
-		context: context,
-	});
+	try {
+		const rpcResult = await rpcHandler.handle(c.req.raw, {
+			prefix: "/rpc",
+			context: context,
+		});
 
-	if (rpcResult.matched) {
-		return c.newResponse(rpcResult.response.body, rpcResult.response);
+		if (rpcResult.matched) {
+			return c.newResponse(rpcResult.response.body, rpcResult.response);
+		}
+
+		return c.notFound();
+	} finally {
+		// await context.dispose();
 	}
+});
 
-	const apiResult = await apiHandler.handle(c.req.raw, {
-		prefix: "/api-reference",
-		context: context,
-	});
+// API Reference routes
+app.use("/api-reference/*", async (c) => {
+	const dbConnection = getDb();
+	const context = await createContext({ context: c, db: dbConnection });
 
-	if (apiResult.matched) {
-		return c.newResponse(apiResult.response.body, apiResult.response);
+	try {
+		const apiResult = await apiHandler.handle(c.req.raw, {
+			prefix: "/api-reference",
+			context: context,
+		});
+
+		if (apiResult.matched) {
+			return c.newResponse(apiResult.response.body, apiResult.response);
+		}
+
+		return c.notFound();
+	} finally {
+		// await context.dispose();
 	}
-
-	await next();
 });
 
 app.get("/", (c) => {
 	return c.text("OK");
 });
 
-export default app;
+// Bun runtime: start server
+const port = env.PORT || 3000;
+console.log(`Server starting on http://localhost:${port}`);
+
+export default {
+	port,
+	fetch: app.fetch,
+};
