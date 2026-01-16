@@ -49,7 +49,7 @@ export function OperationNode({
 	return (
 		<div className="relative">
 			{/* Connector line */}
-			<div className="absolute top-0 -left-4 h-5 w-4 border-muted-foreground/30 border-b-2 border-l-2" />
+			<div className="absolute top-0 -left-4 h-5 w-4 border-muted-foreground/20 border-b-2 border-l-2" />
 
 			<div className="group flex items-center gap-2 py-1">
 				{/* Collapse/Expand button */}
@@ -67,16 +67,16 @@ export function OperationNode({
 
 				{/* Operation display */}
 				<OperatorBadge operator={operation.operator} />
-				<span className="font-mono text-muted-foreground text-sm">
+				<span className="min-w-12 font-mono text-muted-foreground text-sm tabular-nums">
 					{operation.operand}
 				</span>
 				<span className="text-muted-foreground">=</span>
-				<span className="font-medium font-mono text-sm">
+				<span className="min-w-16 font-medium font-mono text-sm tabular-nums">
 					{formatNumber(operation.result)}
 				</span>
 
 				{/* Calculation preview */}
-				<span className="text-muted-foreground/60 text-xs">
+				<span className="min-w-24 text-muted-foreground/60 text-xs tabular-nums">
 					({parentValue} {getOperatorSymbol(operation.operator)}{" "}
 					{operation.operand})
 				</span>
@@ -113,7 +113,7 @@ export function OperationNode({
 
 			{/* Children */}
 			{hasChildren && isExpanded && (
-				<div className="ml-8 border-muted-foreground/20 border-l-2 pl-2">
+				<div className="ml-4 border-muted-foreground/20 border-l-2 pl-4">
 					{operation.children.map((child) => (
 						<OperationNode
 							key={child.id}

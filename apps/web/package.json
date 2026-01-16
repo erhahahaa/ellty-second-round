@@ -5,7 +5,10 @@
 	"scripts": {
 		"build": "vite build",
 		"serve": "vite preview",
-		"dev": "vite dev"
+		"dev": "vite dev",
+		"test": "vitest",
+		"test:run": "vitest run",
+		"test:coverage": "vitest run --coverage"
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.0.0",
@@ -41,17 +44,22 @@
 	"devDependencies": {
 		"@cloudflare/vite-plugin": "^1.17.1",
 		"@ellty-second-round/config": "workspace:*",
+		"@happy-dom/global-registrator": "^20.3.1",
 		"@tanstack/react-query-devtools": "^5.91.1",
 		"@tanstack/react-router-devtools": "^1.141.1",
 		"@testing-library/dom": "^10.4.0",
+		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.2.0",
 		"@types/react": "19.2.7",
 		"@types/react-dom": "19.2.3",
 		"@vitejs/plugin-react": "^5.0.4",
+		"@vitest/coverage-v8": "^4.0.17",
 		"alchemy": "catalog:",
+		"happy-dom": "^20.3.1",
 		"jsdom": "^26.0.0",
 		"typescript": "catalog:",
 		"vite": "^7.0.2",
+		"vitest": "^4.0.17",
 		"web-vitals": "^5.0.3",
 		"wrangler": "catalog:"
 	}

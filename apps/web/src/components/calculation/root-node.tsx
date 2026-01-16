@@ -107,7 +107,7 @@ export function RootNode({ root, isAuthenticated }: RootNodeProps) {
 			{/* Operations tree */}
 			{hasOperations && isExpanded && (
 				<CardContent className="pt-4">
-					<div className="ml-4 border-muted-foreground/20 border-l-2 pl-2">
+					<div className="ml-4 border-muted-foreground/20 border-l-2 pl-4">
 						{root.operations.map((operation) => (
 							<OperationNode
 								key={operation.id}

@@ -9,7 +9,11 @@
 			"default": "./src/*.ts"
 		}
 	},
-	"scripts": {},
+	"scripts": {
+		"test": "vitest",
+		"test:run": "vitest run",
+		"test:coverage": "vitest run --coverage"
+	},
 	"dependencies": {
 		"@ellty-second-round/auth": "workspace:*",
 		"@ellty-second-round/db": "workspace:*",
@@ -27,6 +31,7 @@
 	"devDependencies": {
 		"@ellty-second-round/config": "workspace:*",
 		"@types/ioredis": "^5.0.0",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "^4.0.17"
 	}
 }

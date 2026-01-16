@@ -35,7 +35,10 @@
 		"db:studio": "turbo -F @ellty-second-round/db db:studio",
 		"db:generate": "turbo -F @ellty-second-round/db db:generate",
 		"db:migrate": "turbo -F @ellty-second-round/db db:migrate",
-		"check": "biome check --write ."
+		"check": "biome check --write .",
+		"test": "turbo test:run",
+		"test:watch": "turbo test",
+		"test:coverage": "turbo test:coverage"
 	},
 	"dependencies": {
 		"@ellty-second-round/env": "workspace:*",
@@ -47,8 +50,10 @@
 		"@cloudflare/workers-types": "catalog:",
 		"@ellty-second-round/config": "workspace:*",
 		"@types/node": "catalog:",
+		"@vitest/coverage-v8": "^4.0.17",
 		"turbo": "^2.6.3",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "^4.0.17"
 	},
 	"packageManager": "bun@1.3.5"
 }

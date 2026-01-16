@@ -1,0 +1,6 @@
+[test]
+# Preload DOM environment for frontend tests
+preload = ["./apps/web/src/test/bun-setup.ts"]
+
+# Exclude Vitest-specific tests that use vi.stubGlobal
+# Run with: bun run test (which uses vitest) instead of bun test
