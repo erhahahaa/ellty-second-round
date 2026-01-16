@@ -1,29 +1,40 @@
 import { env } from "@ellty-second-round/env/server";
-import { neon, neonConfig } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-import ws from "ws";
 
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import * as schema from "./schema";
 
-let connectionString = env.DATABASE_URL;
+/**
+ * Creates a new database connection.
+ * For serverless environments, each request should get its own connection.
+ * Returns both the drizzle instance and a close function.
+ */
+export const getDb = () => {
+	const client = postgres(env.DATABASE_URL, {
+		// Use a single connection per request (serverless-friendly)
+		max: 1,
+		// Disable prepared statements - required for environments like
+		// Cloudflare Workers/miniflare where connections may be dropped
+		prepare: false,
+		// Automatically reconnect on connection errors
+		connect_timeout: 10,
+		// Close idle connections immediately to prevent stale connections
+		idle_timeout: 0,
+		// Disable connection lifetime management (we close after each request)
+		max_lifetime: null,
+	});
 
-if (env.NODE_ENV === "development") {
-	connectionString = "postgres://postgres:postgres@db.localtest.me:5432/main";
-	neonConfig.fetchEndpoint = (host) => {
-		const [protocol, port] =
-			host === "db.localtest.me" ? ["http", 4444] : ["https", 443];
-		return `${protocol}://${host}:${port}/sql`;
+	const db = drizzle({ client, schema });
+
+	return {
+		db,
+		close: () => client.end(),
 	};
-	const connectionStringUrl = new URL(connectionString);
-	neonConfig.useSecureWebSocket =
-		connectionStringUrl.hostname !== "db.localtest.me";
-	neonConfig.wsProxy = (host) =>
-		host === "db.localtest.me" ? `${host}:4444/v2` : `${host}/v2`;
-}
-neonConfig.webSocketConstructor = ws;
+};
 
-console.log("Databer URL", connectionString);
+// Export schema for use in other packages
+export { schema };
 
-const sql = neon(connectionString);
-
-export const db = drizzle({ client: sql, schema });
+// Export types
+export type Database = ReturnType<typeof getDb>["db"];
+export type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];

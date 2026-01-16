@@ -5,6 +5,9 @@
 		".": {
 			"default": "./src/index.ts"
 		},
+		"./schema": {
+			"default": "./src/schema/index.ts"
+		},
 		"./*": {
 			"default": "./src/*.ts"
 		}
@@ -17,16 +20,13 @@
 	},
 	"dependencies": {
 		"@ellty-second-round/env": "workspace:*",
-		"@neondatabase/serverless": "^1.0.2",
 		"dotenv": "catalog:",
 		"drizzle-orm": "^0.45.1",
-		"ws": "^8.19.0",
+		"postgres": "^3.4.8",
 		"zod": "catalog:"
 	},
 	"devDependencies": {
 		"@ellty-second-round/config": "workspace:*",
-		"@types/pg": "^8.15.6",
-		"@types/ws": "^8.18.1",
 		"drizzle-kit": "^0.31.8",
 		"typescript": "catalog:"
 	}
