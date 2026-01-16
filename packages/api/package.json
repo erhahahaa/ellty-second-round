@@ -19,10 +19,14 @@
 		"@orpc/server": "catalog:",
 		"@orpc/zod": "catalog:",
 		"dotenv": "catalog:",
+		"drizzle-orm": "^0.45.1",
+		"hono": "^4.8.2",
+		"ioredis": "^5.6.1",
 		"zod": "catalog:"
 	},
 	"devDependencies": {
 		"@ellty-second-round/config": "workspace:*",
+		"@types/ioredis": "^5.0.0",
 		"typescript": "catalog:"
 	}
 }
