@@ -1,0 +1,3 @@
+{
+	"extends": "@ellty-second-round/config/tsconfig.base.json"
+}
