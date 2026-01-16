@@ -1,0 +1,54 @@
+{
+	"name": "ellty-second-round",
+	"private": true,
+	"workspaces": {
+		"packages": [
+			"apps/*",
+			"packages/*"
+		],
+		"catalog": {
+			"dotenv": "^17.2.2",
+			"zod": "^4.1.13",
+			"typescript": "^5",
+			"@types/node": "^22.13.14",
+			"@cloudflare/workers-types": "^4.20251213.0",
+			"@orpc/server": "^1.12.2",
+			"@orpc/openapi": "^1.12.2",
+			"@orpc/zod": "^1.12.2",
+			"better-auth": "^1.4.9",
+			"alchemy": "^0.83.1",
+			"wrangler": "^4.54.0",
+			"@orpc/client": "^1.12.2"
+		}
+	},
+	"type": "module",
+	"scripts": {
+		"dev": "turbo -F @ellty-second-round/infra dev",
+		"deploy": "turbo -F @ellty-second-round/infra deploy",
+		"destroy": "turbo -F @ellty-second-round/infra destroy",
+		"build": "turbo build",
+		"check-types": "turbo check-types",
+		"dev:native": "turbo -F native dev",
+		"dev:web": "turbo -F web dev",
+		"dev:server": "turbo -F server dev",
+		"db:push": "turbo -F @ellty-second-round/db db:push",
+		"db:studio": "turbo -F @ellty-second-round/db db:studio",
+		"db:generate": "turbo -F @ellty-second-round/db db:generate",
+		"db:migrate": "turbo -F @ellty-second-round/db db:migrate",
+		"check": "biome check --write ."
+	},
+	"dependencies": {
+		"@ellty-second-round/env": "workspace:*",
+		"dotenv": "catalog:",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.0",
+		"@cloudflare/workers-types": "catalog:",
+		"@ellty-second-round/config": "workspace:*",
+		"@types/node": "catalog:",
+		"turbo": "^2.6.3",
+		"typescript": "catalog:"
+	},
+	"packageManager": "bun@1.3.5"
+}
