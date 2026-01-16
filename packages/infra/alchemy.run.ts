@@ -1,5 +1,5 @@
 import alchemy from "alchemy";
-import { TanStackStart, Worker } from "alchemy/cloudflare";
+import { KVNamespace, TanStackStart, Worker } from "alchemy/cloudflare";
 import { GitHubComment } from "alchemy/github";
 import { CloudflareStateStore } from "alchemy/state";
 import { config } from "dotenv";
@@ -19,6 +19,11 @@ const app = await alchemy("ellty-second-round", {
 	stateStore: (scope) => new CloudflareStateStore(scope),
 });
 
+// Create KV namespace for caching
+const cacheKV = await KVNamespace("cache-kv", {
+	title: "ellty-second-round-cache",
+});
+
 export const web = await TanStackStart("web", {
 	cwd: "../../apps/web",
 	bindings: {
@@ -31,11 +36,13 @@ export const server = await Worker("server", {
 	entrypoint: "src/index.ts",
 	compatibility: "node",
 	bindings: {
+		PORT: "3000",
 		NODE_ENV: alchemy.env.NODE_ENV ?? "development",
 		DATABASE_URL: alchemy.secret.env.DATABASE_URL ?? "",
 		CORS_ORIGIN: alchemy.env.CORS_ORIGIN ?? "",
 		BETTER_AUTH_SECRET: alchemy.secret.env.BETTER_AUTH_SECRET ?? "",
 		BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL ?? "",
+		CACHE_KV: cacheKV,
 	},
 	dev: {
 		port: 3000,
